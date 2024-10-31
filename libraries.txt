@@ -1,0 +1,8 @@
+# Wokwi Library List
+# See https://docs.wokwi.com/guides/libraries
+
+DHT22
+DHT sensor library
+ESP32MQTTClient
+PubSubClient
+Adafruit MPU6050

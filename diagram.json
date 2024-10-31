@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "author": "Andrei S",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-breadboard-mini", "id": "bb1", "top": -116.6, "left": -252, "attrs": {} },
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 14.44, "attrs": {} },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": -220.5,
+      "left": -197.4,
+      "attrs": { "temperature": "35.7", "humidity": "34.5" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -62.4,
+      "left": -288.55,
+      "rotate": 90,
+      "attrs": { "value": "10000" }
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "ultrasonic1",
+      "top": -286.5,
+      "left": -90.5,
+      "attrs": { "distance": "218" }
+    },
+    { "type": "wokwi-mpu6050", "id": "imu1", "top": -312.98, "left": 223.12, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "bb1:10t.e", "esp:GND.1", "black", [ "v0" ] ],
+    [ "bb1:8t.e", "r1:1", "red", [ "v0" ] ],
+    [ "bb1:8b.f", "r1:2", "red", [ "v0" ] ],
+    [ "bb1:8b.j", "esp:3V3", "red", [ "v19.2", "h191.85" ] ],
+    [ "bb1:7t.e", "esp:3V3", "red", [ "v86.4", "h19.2" ] ],
+    [ "esp:32", "bb1:8t.b", "green", [ "h-67.05", "v-182.4" ] ],
+    [ "dht1:VCC", "bb1:7t.a", "", [ "$bb" ] ],
+    [ "dht1:SDA", "bb1:8t.a", "", [ "$bb" ] ],
+    [ "dht1:NC", "bb1:9t.a", "", [ "$bb" ] ],
+    [ "dht1:GND", "bb1:10t.a", "", [ "$bb" ] ],
+    [ "ultrasonic1:VCC", "bb1:13t.a", "red", [ "v38.4", "h-105.6" ] ],
+    [ "ultrasonic1:TRIG", "bb1:14t.a", "green", [ "v48", "h-106" ] ],
+    [ "ultrasonic1:ECHO", "bb1:15t.a", "green", [ "v57.6", "h-106.4" ] ],
+    [ "ultrasonic1:GND", "bb1:16t.a", "black", [ "v67.2", "h-106.8" ] ],
+    [ "esp:5", "bb1:14t.c", "green", [ "h-124.8", "v-144", "h-105.6" ] ],
+    [ "esp:18", "bb1:15t.c", "green", [ "h28.8", "v-153.6", "h-249.6" ] ],
+    [ "bb1:13t.c", "esp:5V", "green", [ "v307.2", "h143.85" ] ],
+    [ "esp:GND.1", "bb1:16t.c", "black", [ "h-86.25", "v-240" ] ],
+    [ "esp:21", "imu1:SDA", "green", [ "v-297.6", "h57.52" ] ],
+    [ "esp:22", "imu1:SCL", "green", [ "h134.4", "v-288", "h-67.28" ] ],
+    [ "imu1:GND", "esp:GND.1", "black", [ "v115.2", "h-172.87" ] ],
+    [ "imu1:VCC", "esp:3V3", "red", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
