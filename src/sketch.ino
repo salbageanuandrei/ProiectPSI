@@ -162,23 +162,31 @@ void mpuloop()
   dtostrf(a.acceleration.x, 1, 2, accelerationX);
   dtostrf(a.acceleration.y, 1, 2, accelerationY);
   dtostrf(a.acceleration.z, 1, 2, accelerationZ);
-  client.publish("esp32/accel","Accelerometer:");
-  client.publish("esp32/accel",accelerationX);
-  client.publish("esp32/accel",accelerationY);
-  client.publish("esp32/accel",accelerationZ);
+  //client.publish("esp32/accel","Accelerometer:");
+  strcat(accelerationX,",");
+  client.publish("esp32/accelx",accelerationX);
+  strcat(accelerationY,",");
+  client.publish("esp32/accely",accelerationY);
+  strcat(accelerationZ,",");
+  client.publish("esp32/accelz",accelerationZ);
 
 
   dtostrf(g.gyro.x, 1, 2, gyroXchar);
   dtostrf(g.gyro.y, 1, 2, gyroYchar);
   dtostrf(g.gyro.z, 1, 2, gyroZchar);
-  client.publish("esp32/gyro","Rotation:");
-  client.publish("esp32/gyro",gyroXchar);
-  client.publish("esp32/gyro",gyroYchar);
-  client.publish("esp32/gyro",gyroZchar);
+  //client.publish("esp32/gyro","Rotation:");
+  strcat(gyroXchar,",");
+  client.publish("esp32/gyrox",gyroXchar);
+  strcat(gyroYchar,",");
+  client.publish("esp32/gyroy",gyroYchar);
+  strcat(gyroZchar,",");
+  client.publish("esp32/gyroz",gyroZchar);
 
+  
   dtostrf(temp.temperature, 1, 2, tempMPU);
-  client.publish("esp32/tempMPU","TemperatureMPU:");
-  client.publish("esp32/tempMPU",tempMPU);
+  strcat(tempMPU,",");
+  //client.publish("esp32/tempMPU","TemperatureMPU:");
+  client.publish("esp32/tempMPU",tempMPU );
 }
 
 
@@ -197,7 +205,8 @@ void distancesensorloop()
   distanceinCm = durationMeasurement * SPEED_OF_SOUND/2;
   //dtostrf(distanceinCm, 1, 0, distanceCmstring);
   itoa(distanceinCm, distanceCmChar, 10);
-  client.publish("esp32/dist", "Distanta in cm:");
+  //client.publish("esp32/dist", "Distanta in cm:");
+  strcat(distanceCmChar,",");
   client.publish("esp32/dist",distanceCmChar);
 
 }
@@ -248,9 +257,13 @@ void reconnect() {
       Serial.println("subscribe to distance topic");
       client.subscribe("esp32/dist");
       Serial.println("subscribe to gyroscope topic");
-      client.subscribe("esp32/gyro");
+      client.subscribe("esp32/gyrox");
+      client.subscribe("esp32/gyroy");
+      client.subscribe("esp32/gyroz");
       Serial.println("subscribe to accelometer topic");
-      client.subscribe("esp32/accel");
+      client.subscribe("esp32/accelx");
+      client.subscribe("esp32/accely");
+      client.subscribe("esp32/accelz");
       Serial.println("subscribe to tempMPU topic");
       client.subscribe("esp32/tempMPU");
     } else {
@@ -294,10 +307,12 @@ void loop() {
     //Convert from float to char   
     dtostrf(humi, 1, 2, humstring);
     //Publish on MQTT topic
-    client.publish("esp32/temp", "Temperatura:");
+    //client.publish("esp32/temp", "Temperatura:");
+    strcat(tempstring,",");
     client.publish("esp32/temp",tempstring);
     //Publish on MQTT topic
-    client.publish("esp32/hum", "Umiditate:");
+    //client.publish("esp32/hum", "Umiditate:");
+    strcat(humstring,",");
     client.publish("esp32/hum",humstring);
   }
   distancesensorloop();
@@ -306,5 +321,3 @@ void loop() {
   // wait 500 ms 
   delay(500);
 }
-
-
