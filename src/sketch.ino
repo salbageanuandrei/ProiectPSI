@@ -32,27 +32,29 @@ DHT dht22(DHT22_PIN, DHT22);
 
 /*Main Setup*/
 void setup() {
-/*Setup of serial output*/
-Serial.begin(9600);
+  /*Setup of serial output*/
+  Serial.begin(9600);
 
-/*Setup MPU6050 sensor*/
-InitializeMPU6050();
+  /*Setup MPU6050 sensor*/
+  InitializeMPU6050();
 
-SetupGyroRange();
-SetupAcceloRange();
-SetupBandwidth();
+  SetupGyroRange();
+  SetupAcceloRange();
+  SetupBandwidth();
 
-/*Setup of untrasonic sensor*/
+  /*Setup of untrasonic sensor*/
   pinMode(TriggerPin, OUTPUT);
   pinMode(EchoPin, INPUT);
 
- /*Setup of temp and humidity sensor*/
+  /*Setup of temp and humidity sensor*/
   dht22.begin(); // se initializeaza senzorul DHT22
 
-/*Setup of WI fi connection*/
+
+
+  /*Setup of WI fi connection*/
   setup_wifi();
 
-/*Setup of MQTT server client */
+  /*Setup of MQTT server client */
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 
@@ -61,6 +63,7 @@ SetupBandwidth();
 
 void InitializeMPU6050()
 {
+  /*Initialize MPU6050 accelerometer and gyroscope sensor*/
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
     while (1) {
@@ -76,7 +79,8 @@ void InitializeMPU6050()
 
 void SetupGyroRange()
 {
- mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  /*Set Gyroscope configuration*/
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
   Serial.print("Gyro range set to: ");
   switch (mpu.getGyroRange()) {
   case MPU6050_RANGE_250_DEG:
@@ -96,6 +100,7 @@ void SetupGyroRange()
 
 void SetupAcceloRange()
 {
+  /*Set Accelerometer configuration*/
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
   Serial.print("Accelerometer range set to: ");
   switch (mpu.getAccelerometerRange()) {
@@ -117,6 +122,7 @@ void SetupAcceloRange()
 
 void SetupBandwidth()
 {
+  /*Set Bandwidth mode for MPU6050 sensor*/
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
   Serial.print("Filter bandwidth set to: ");
   switch (mpu.getFilterBandwidth()) 
@@ -146,6 +152,7 @@ void SetupBandwidth()
 }
 void mpuloop()
 {
+  /*Initialize fucntion variables*/
   char accelerationX[8];
   char accelerationY[8];
   char accelerationZ[8];
@@ -156,36 +163,63 @@ void mpuloop()
 
   char tempMPU[8];
   
+  /*Get the event based on sensor paramters for acceleration, rotation and temperature*/
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
+  /* Convert acccelaration coordonates to string*/
   dtostrf(a.acceleration.x, 1, 2, accelerationX);
   dtostrf(a.acceleration.y, 1, 2, accelerationY);
   dtostrf(a.acceleration.z, 1, 2, accelerationZ);
-  //client.publish("esp32/accel","Accelerometer:");
+
+  /*Add a comma separator for easy data interpretation in Mobile App*/
   strcat(accelerationX,",");
+  
+  /*Publish the data to the MQTT Broker*/
   client.publish("esp32/accelx",accelerationX);
+  
+  /*Add a comma separator for easy data interpretation in Mobile App*/
   strcat(accelerationY,",");
+
+  /*Publish the data to the MQTT Broker*/
   client.publish("esp32/accely",accelerationY);
+  
+  /*Add a comma separator for easy data interpretation in Mobile App*/
   strcat(accelerationZ,",");
+  
+  /*Publish the data to the MQTT Broker*/
   client.publish("esp32/accelz",accelerationZ);
 
-
+  /*Convert rotation coordonates to string*/
   dtostrf(g.gyro.x, 1, 2, gyroXchar);
   dtostrf(g.gyro.y, 1, 2, gyroYchar);
   dtostrf(g.gyro.z, 1, 2, gyroZchar);
-  //client.publish("esp32/gyro","Rotation:");
+
+  /*Add a comma separator for easy data interpretation in Mobile App*/
   strcat(gyroXchar,",");
+  
+  /*Publish the data to the MQTT Broker*/
   client.publish("esp32/gyrox",gyroXchar);
+  
+  /*Add a comma separator for easy data interpretation in Mobile App*/
   strcat(gyroYchar,",");
+  
+  /*Publish the data to the MQTT Broker*/
   client.publish("esp32/gyroy",gyroYchar);
+  
+  /*Add a comma separator for easy data interpretation in Mobile App*/
   strcat(gyroZchar,",");
+  
+  /*Publish the data to the MQTT Broker*/
   client.publish("esp32/gyroz",gyroZchar);
 
-  
+  /*Convert temperature to string*/
   dtostrf(temp.temperature, 1, 2, tempMPU);
+  
+  /*Add a comma separator for easy data interpretation in Mobile App*/
   strcat(tempMPU,",");
-  //client.publish("esp32/tempMPU","TemperatureMPU:");
+
+  /*Publish the data to the MQTT Broker*/
   client.publish("esp32/tempMPU",tempMPU );
 }
 
@@ -202,28 +236,33 @@ void distancesensorloop()
 
   durationMeasurement = pulseIn(EchoPin, HIGH);
 
+  /* Calculate the distance in cm*/
   distanceinCm = durationMeasurement * SPEED_OF_SOUND/2;
-  //dtostrf(distanceinCm, 1, 0, distanceCmstring);
+
+  /*Convert distance into char array*/
   itoa(distanceinCm, distanceCmChar, 10);
-  //client.publish("esp32/dist", "Distanta in cm:");
+  
+  /*Add a comma separator for easy data interpretation in Mobile App*/
   strcat(distanceCmChar,",");
+  
+  /*Publish the data to the MQTT Broker*/
   client.publish("esp32/dist",distanceCmChar);
 
 }
 
 void setup_wifi() {
   delay(10);
-  // We start by connecting to a WiFi network
+
+  // Connect to Wokwi WI-Fi newtwork as Guest 
   Serial.println();
   Serial.print("Connecting to Wifi");
-
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-
   Serial.println("");
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
@@ -235,6 +274,7 @@ void callback(char* topic, byte* message, unsigned int length) {
   Serial.print(" ");
   String messageTempVar;
   
+  /*Print the messages that arrive from the MQTT Broker*/
   for (int i = 0; i < length; i++) {
     Serial.print((char)message[i]);
     messageTempVar += (char)message[i];
@@ -249,7 +289,7 @@ void reconnect() {
     // Attempting  to connect with the ESP client
     if (client.connect("ESP32Client-AndreiMircea" )) {
       Serial.println("connected");
-      // Subscribe on topics
+      // Subscribe on all of the topics
       Serial.println("subscribe to temperature topic");
       client.subscribe("esp32/temp");
       Serial.println("subscribe to humidity topic");
@@ -304,15 +344,20 @@ void loop() {
   else {
     //Convert from float to char
     dtostrf(tempC, 1, 2, tempstring);
+	
     //Convert from float to char   
     dtostrf(humi, 1, 2, humstring);
-    //Publish on MQTT topic
-    //client.publish("esp32/temp", "Temperatura:");
+	
+    /*Publish the data to the MQTT Broker*/
     strcat(tempstring,",");
+	
+	/*Publish the data to the MQTT Broker*/
     client.publish("esp32/temp",tempstring);
-    //Publish on MQTT topic
-    //client.publish("esp32/hum", "Umiditate:");
+    
+	/*Add a comma separator for easy data interpretation in Mobile App*/
     strcat(humstring,",");
+	
+	/*Publish the data to the MQTT Broker*/
     client.publish("esp32/hum",humstring);
   }
   distancesensorloop();
