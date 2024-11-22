@@ -56,7 +56,6 @@ void setup() {
 
   /*Setup of MQTT server client */
   client.setServer(mqtt_server, mqtt_port);
-  client.setCallback(callback);
 
 }
 
@@ -289,23 +288,7 @@ void reconnect() {
     // Attempting  to connect with the ESP client
     if (client.connect("ESP32Client-AndreiMircea" )) {
       Serial.println("connected");
-      // Subscribe on all of the topics
-      Serial.println("subscribe to temperature topic");
-      client.subscribe("esp32/temp");
-      Serial.println("subscribe to humidity topic");
-      client.subscribe("esp32/hum");
-      Serial.println("subscribe to distance topic");
-      client.subscribe("esp32/dist");
-      Serial.println("subscribe to gyroscope topic");
-      client.subscribe("esp32/gyrox");
-      client.subscribe("esp32/gyroy");
-      client.subscribe("esp32/gyroz");
-      Serial.println("subscribe to accelometer topic");
-      client.subscribe("esp32/accelx");
-      client.subscribe("esp32/accely");
-      client.subscribe("esp32/accelz");
-      Serial.println("subscribe to tempMPU topic");
-      client.subscribe("esp32/tempMPU");
+      
     } else {
       Serial.print("failed, error state=");
       Serial.print(client.state());
